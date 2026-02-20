@@ -12,11 +12,6 @@ base {
 repositories {
     mavenCentral()
     maven { url "https://maven.hytale.com/release" }
-    maven { url "https://cursemaven.com" }
-
-    flatDir {
-        dirs("libs")
-    }
 }
 
 hytale {
