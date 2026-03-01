@@ -1,43 +1,32 @@
 plugins {
-    id 'java'
-    id "hytale-mod" version "0.+"
+    id 'dev.scaffoldit' version '0.2.+'
 }
 
 version = project.mod_version
 
-base {
-    archivesName = project.archives_base_name
-}
-
-repositories {
-    mavenCentral()
-    maven { url "https://maven.hytale.com/release" }
-}
-
 hytale {
-    // updateChannel = "pre-release"
-}
+    usePatchline 'release'
+    useVersion 'latest'
 
-dependencies {
-    implementation "com.hypixel.hytale:Server:${project.hytale_version}"
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+    repositories {
+        mavenCentral()
     }
-}
 
-processResources {
-    var expandProps = [
-            'name'       : project.name,
-            'version'    : project.version,
-            'group'      : project.group,
-            'hytale_version' : project.hytale_version,
-            'entry_point': project.entry_point
-    ]
+    dependencies {
+    }
 
-    filesMatching(['manifest.json']) {
-        expand expandProps
+    manifest {
+        group = project.group
+        name = project.name
+        main = project.entry_point
+        version = project.version
+        serverVersion = project.hytale_version
+        disabledByDefault = false
+        includesAssetPack = false
+        dependencies = [
+                'Hytale:EntityModule': '*',
+                'Hytale:ItemModule': '*'
+        ]
+        subPlugins = []
     }
 }

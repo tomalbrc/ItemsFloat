@@ -1,20 +1,21 @@
 {
-  "Group": "${group}",
-  "Name": "${name}",
-  "Version": "${version}",
-  "ServerVersion": "${hytale_version}",
-  "Description": "Items Float!",
-  "Authors": [
-    {
-      "Name": "tomalbrc"
-    }
-  ],
-  "Website": "https://discord.gg/9X6w2kfy89",
-  "Dependencies": {
-    "Hytale:BlockModule": "*"
-  },
-  "OptionalDependencies": {},
-  "DisabledByDefault": false,
-  "Main": "${entry_point}",
-  "IncludesAssetPack": false
+    "Group": "tomalbrc",
+    "Name": "ItemsFloat",
+    "Version": "1.0.1",
+    "Description": "Items Float!",
+    "Authors": [
+        {
+            "Name": "tomalbrc"
+        }
+    ],
+    "Website": "https://discord.gg/9X6w2kfy89",
+    "DisabledByDefault": false,
+    "IncludesAssetPack": false,
+    "Dependencies": {
+        "Hytale:EntityModule": "*",
+        "Hytale:ItemModule": "*"
+    },
+    "OptionalDependencies": {},
+    "ServerVersion": "2026.02.19-1a311a592",
+    "Main": "de.tomalbrc.itemsfloat.ItemsFloatPlugin"
 }
