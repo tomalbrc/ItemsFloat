@@ -38,9 +38,9 @@ public class FloatingItemSystem extends EntityTickingSystem<EntityStore> {
         return this.query;
     }
 
-    public boolean isInFluid(@Nonnull Store<EntityStore> store, int x, int y, int z) {
+    public int isInFluid(@Nonnull Store<EntityStore> store, int x, int y, int z) {
         World world = store.getExternalData().getWorld();
-        int fluidId = 0;
+        byte level = 0;
         ChunkStore chunkStore = world.getChunkStore();
         long chunkIndex = ChunkUtil.indexChunkFromBlock(x, z);
         Ref<ChunkStore> columnRef = chunkStore.getChunkReference(chunkIndex);
@@ -54,14 +54,14 @@ public class FloatingItemSystem extends EntityTickingSystem<EntityStore> {
                     if (sectionRef != null && sectionRef.isValid()) {
                         FluidSection fluidSection = chunkStore.getStore().getComponent(sectionRef, FluidSection.getComponentType());
                         if (fluidSection != null) {
-                            fluidId = fluidSection.getFluidId(x & 31, y & 31, z & 31);
+                            level = fluidSection.getFluidLevel(x & 31, y & 31, z & 31);
                         }
                     }
                 }
             }
         }
 
-        return fluidId != 0;
+        return level;
     }
 
     @Override
@@ -73,15 +73,22 @@ public class FloatingItemSystem extends EntityTickingSystem<EntityStore> {
             int x = (int)Math.floor(pos.getX());
             int y = (int)Math.floor(unfilteredY);
             int z = (int)Math.floor(pos.getZ());
-            var inWater = this.isInFluid(store, x, y, z);
-            var blockAboveIsInWater = this.isInFluid(store, x, y + 1, z);
-            if (inWater) {
-                var v = 1.0 - ((pos.getY() +0.4) - (double)y);
+
+            var fluidLevel = this.isInFluid(store, x, y, z);
+            var blockAboveIsFluid = this.isInFluid(store, x, y + 1, z);
+
+            if (fluidLevel > 0) {
+                double maxFluidLevel = 8.0;
+
+                double fluidHeight = blockAboveIsFluid > 0 ? 1.0 : (fluidLevel / maxFluidLevel);
+
+                double v = fluidHeight - ((pos.getY() + 0.4) - (double)y);
 
                 var velocity = chunk.getComponent(index, Velocity.getComponentType());
-                if (velocity != null && (blockAboveIsInWater || v > 0)) {
+                if (velocity != null && (blockAboveIsFluid > 0 || v > 0)) {
                     var s = 1.1;
-                    Vector3d jumpVector = new Vector3d(0, blockAboveIsInWater ? s : s*v, 0).addScaled(velocity.getVelocity(), 0.5);
+
+                    Vector3d jumpVector = new Vector3d(0, blockAboveIsFluid > 0 ? s : s * v, 0).addScaled(velocity.getVelocity(), 0.5);
 
                     velocity.addInstruction(jumpVector, null, ChangeVelocityType.Set);
                 }
