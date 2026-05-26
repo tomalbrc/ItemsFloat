@@ -6,7 +6,7 @@ version = project.mod_version
 
 hytale {
     usePatchline 'release'
-    useVersion 'latest'
+    useVersion project.hytale_version
 
     repositories {
         mavenCentral()

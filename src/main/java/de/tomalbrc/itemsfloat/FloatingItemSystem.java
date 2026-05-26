@@ -10,7 +10,6 @@ import com.hypixel.hytale.component.dependency.SystemDependency;
 import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.component.system.tick.EntityTickingSystem;
 import com.hypixel.hytale.math.util.ChunkUtil;
-import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.protocol.ChangeVelocityType;
 import com.hypixel.hytale.server.core.modules.entity.component.BoundingBox;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
@@ -22,6 +21,7 @@ import com.hypixel.hytale.server.core.universe.world.chunk.ChunkColumn;
 import com.hypixel.hytale.server.core.universe.world.chunk.section.FluidSection;
 import com.hypixel.hytale.server.core.universe.world.storage.ChunkStore;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import org.joml.Vector3d;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
@@ -69,10 +69,10 @@ public class FloatingItemSystem extends EntityTickingSystem<EntityStore> {
         TransformComponent transform = chunk.getComponent(index, TransformComponent.getComponentType());
         if (transform != null) {
             Vector3d pos = transform.getPosition();
-            double unfilteredY = pos.getY();
-            int x = (int)Math.floor(pos.getX());
-            int y = (int)Math.floor(unfilteredY);
-            int z = (int)Math.floor(pos.getZ());
+            double unfilteredY = pos.y;
+            int x = (int) Math.floor(pos.x);
+            int y = (int) Math.floor(unfilteredY);
+            int z = (int) Math.floor(pos.z);
 
             var fluidLevel = this.isInFluid(store, x, y, z);
             var blockAboveIsFluid = this.isInFluid(store, x, y + 1, z);
@@ -82,14 +82,13 @@ public class FloatingItemSystem extends EntityTickingSystem<EntityStore> {
 
                 double fluidHeight = blockAboveIsFluid > 0 ? 1.0 : (fluidLevel / maxFluidLevel);
 
-                double v = fluidHeight - ((pos.getY() + 0.4) - (double)y);
+                double v = fluidHeight - ((pos.y + 0.4) - (double) y);
 
                 var velocity = chunk.getComponent(index, Velocity.getComponentType());
                 if (velocity != null && (blockAboveIsFluid > 0 || v > 0)) {
                     var s = 1.1;
 
-                    Vector3d jumpVector = new Vector3d(0, blockAboveIsFluid > 0 ? s : s * v, 0).addScaled(velocity.getVelocity(), 0.5);
-
+                    Vector3d jumpVector = new Vector3d(0, blockAboveIsFluid > 0 ? s : s * v, 0).add(velocity.getVelocity().get(new Vector3d()).mul(0.5));
                     velocity.addInstruction(jumpVector, null, ChangeVelocityType.Set);
                 }
             }
